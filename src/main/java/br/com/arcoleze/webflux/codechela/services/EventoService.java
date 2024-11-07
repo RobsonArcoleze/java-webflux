@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,6 +20,7 @@ public class EventoService {
 
     private final EventoRepository eventoRepository;
 
+    @Transactional(readOnly = true)
     public Flux<EventoDto> findAll() {
         return eventoRepository.findAll().map(evento -> new EventoDto(
                 evento.getId(),
@@ -29,6 +31,7 @@ public class EventoService {
         ));
     }
 
+    @Transactional(readOnly = true)
     public Mono<EventoDto> findById(Long id) {
         return eventoRepository.findById(id).map(evento -> new EventoDto(
                 evento.getId(),
@@ -39,6 +42,7 @@ public class EventoService {
         ));
     }
 
+    @Transactional
     public Mono<EventoDto> save(EventoDto eventoDto) {
         Evento evento = new Evento();
         BeanUtils.copyProperties(eventoDto, evento);
@@ -51,10 +55,12 @@ public class EventoService {
         ));
     }
 
+    @Transactional
     public Mono<Void> deleteById(Long id) {
         return eventoRepository.deleteById(id);
     }
 
+    @Transactional
     public Mono<EventoDto> update(EventoDto eventoDto) {
         Evento evento = new Evento();
         BeanUtils.copyProperties(eventoDto, evento);
@@ -70,6 +76,7 @@ public class EventoService {
                 ));
     }
 
+    @Transactional(readOnly = true)
     public Flux<EventoDto> findByCategory(String tipo) {
         TipoEvento type = TipoEvento.valueOf(tipo.toUpperCase());
         return eventoRepository.findByTipo(type).switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Tipo não encontrado")))

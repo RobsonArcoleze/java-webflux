@@ -43,6 +43,7 @@ public class EventoController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     private Mono<EventoDto> save(@RequestBody EventoDto eventoDto){
         return eventoService.save(eventoDto).doOnSuccess(eventosSink::tryEmitNext);
     }
